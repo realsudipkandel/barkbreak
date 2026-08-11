@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Settings — Bark Break</title>
+    <link rel="stylesheet" href="theme.css" />
+  </head>
+  <body>
+    <main class="app" data-testid="options-app">
+      <h1>Settings</h1>
+      <p class="lead">Local-only. No account. Site access is requested one origin at a time.</p>
+
+      <section class="card stack">
+        <h2>Guarded sites</h2>
+        <div id="site-list" class="stack" data-testid="site-list"></div>
+        <label class="field">Add domain
+          <input id="add-domain" placeholder="reddit.com" data-testid="add-domain" />
+        </label>
+        <button type="button" class="btn" id="add-site" data-testid="add-site">Guard site</button>
+        <p class="muted" id="site-message" role="status"></p>
+      </section>
+
+      <section class="card stack">
+        <h2>Breaks & mode</h2>
+        <label class="field">Strictness
+          <select id="mode" data-testid="mode">
+            <option value="gentle">Gentle nudge</option>
+            <option value="gate">Good-boy gate</option>
+            <option value="focus_only">Focus-only</option>
+          </select>
+        </label>
+        <label class="field">Default break
+          <select id="break-minutes" data-testid="break-minutes">
+            <option value="1">1 minute</option>
+            <option value="3">3 minutes</option>
+            <option value="5">5 minutes</option>
+            <option value="10">10 minutes</option>
+          </select>
+        </label>
+        <label class="field">Default budget (minutes)
+          <input id="budget-minutes" type="number" min="1" max="240" data-testid="budget-minutes" />
+        </label>
+      </section>
+
+      <section class="card stack">
+        <h2>Quiet hours</h2>
+        <label><input type="checkbox" id="quiet-enabled" data-testid="quiet-enabled" /> Enable quiet hours</label>
+        <div class="row">
+          <label class="field">Start<input id="quiet-start" type="time" data-testid="quiet-start" /></label>
+          <label class="field">End<input id="quiet-end" type="time" data-testid="quiet-end" /></label>
+        </div>
+      </section>
+
+      <section class="card stack">
+        <h2>Accessibility</h2>
+        <label class="field">Motion
+          <select id="motion" data-testid="options-motion">
+            <option value="full">Full</option>
+            <option value="reduced">Reduced</option>
+            <option value="static">Static</option>
+          </select>
+        </label>
+        <label><input type="checkbox" id="simple-copy" data-testid="simple-copy" /> Simple copy</label>
+        <label><input type="checkbox" id="high-contrast" data-testid="high-contrast" /> High contrast</label>
+        <label><input type="checkbox" id="sound" data-testid="options-sound" /> Sound</label>
+        <label class="field">Text size
+          <select id="text-scale" data-testid="text-scale">
+            <option value="100">100%</option>
+            <option value="125">125%</option>
+            <option value="150">150%</option>
+            <option value="200">200%</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="card stack">
+        <h2>Dog</h2>
+        <label class="field">Name<input id="pet-name" maxlength="24" data-testid="pet-name" /></label>
+        <label class="field">Personality
+          <select id="personality" data-testid="personality">
+            <option value="goofy">Goofy</option>
+            <option value="gentle">Gentle</option>
+            <option value="dramatic">Dramatic</option>
+            <option value="detective">Detective</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="card stack">
+        <h2>Privacy</h2>
+        <p class="muted">Bark Break stores your dog, settings, selected domains, and aggregate break/focus progress locally. It does not read page content, build a browsing profile, sell data, or require an account.</p>
+        <div class="row">
+          <button type="button" class="btn secondary" id="export-data" data-testid="export-data">Export JSON</button>
+          <button type="button" class="btn ghost" id="clear-today" data-testid="clear-today">Clear today</button>
+          <button type="button" class="btn ghost" id="clear-progress" data-testid="clear-progress">Clear progress</button>
+          <button type="button" class="btn" id="reset-all" data-testid="reset-all">Erase everything</button>
+        </div>
+        <p class="muted" id="privacy-message" role="status"></p>
+      </section>
+
+      <section class="card stack">
+        <h2>Pause</h2>
+        <div class="row">
+          <button type="button" class="btn secondary" data-pause="900000">15 minutes</button>
+          <button type="button" class="btn secondary" data-pause="3600000">1 hour</button>
+          <button type="button" class="btn secondary" data-pause="86400000">Until tomorrow</button>
+          <button type="button" class="btn ghost" id="clear-pause">Resume</button>
+        </div>
+      </section>
+
+      <button type="button" class="btn teal" id="save-settings" data-testid="save-settings">Save</button>
+      <p class="muted" id="save-message" role="status"></p>
+    </main>
+    <script src="shared.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

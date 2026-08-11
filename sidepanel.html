@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bark Break — Kennel</title>
+    <link rel="stylesheet" href="theme.css" />
+  </head>
+  <body>
+    <main class="app" data-testid="sidepanel-app">
+      <div class="row" style="justify-content: space-between; align-items: center">
+        <div class="status-strip" data-testid="status-strip">
+          <span class="status-dot" id="status-dot" aria-hidden="true"></span>
+          <span id="status-label">On duty</span>
+        </div>
+        <strong id="biscuit-count" data-testid="biscuit-count">0 biscuits</strong>
+      </div>
+
+      <section id="panel-home" class="panel active" data-testid="panel-home">
+        <div id="dog-scene" class="dog-scene coat-golden" aria-label="Dog kennel scene">
+          <svg class="dog-svg" viewBox="0 0 180 160" role="img" aria-label="Your dog">
+            <ellipse cx="90" cy="120" rx="48" ry="28" fill="var(--dog-fill)" stroke="#18324A" stroke-width="4"/>
+            <circle cx="90" cy="78" r="36" fill="var(--dog-fill)" stroke="#18324A" stroke-width="4"/>
+            <g id="ear-left"></g>
+            <g id="ear-right"></g>
+            <circle cx="78" cy="78" r="4" fill="#18324A"/>
+            <circle cx="102" cy="78" r="4" fill="#18324A"/>
+            <ellipse cx="90" cy="90" rx="7" ry="4" fill="#18324A"/>
+            <path d="M118 108 q20 -10 28 8" fill="none" stroke="#18324A" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card" id="context-card" data-testid="context-card">
+          <p class="metric"><span id="dog-name-label">Biscuit</span><span id="bond-label">New Neighbour</span></p>
+          <p class="lead" id="context-text">Ready when you are.</p>
+        </div>
+        <div class="grid-2">
+          <button type="button" class="btn secondary" data-care="pet" data-testid="care-pet">Pet</button>
+          <button type="button" class="btn secondary" data-care="water" data-testid="care-water">Water</button>
+          <button type="button" class="btn secondary" data-care="play" data-testid="care-play">Play</button>
+          <button type="button" class="btn secondary" data-care="feed" data-testid="care-feed">Feed</button>
+        </div>
+        <p class="muted" id="care-message" role="status" data-testid="care-message"></p>
+        <div class="stack" style="margin-top: 12px">
+          <button type="button" class="btn" id="take-break" data-testid="take-break">Take a break</button>
+          <button type="button" class="btn teal" id="start-focus" data-testid="start-focus">Start Focus Fetch</button>
+          <button type="button" class="btn ghost" id="global-pause" data-testid="global-pause">Pause 1 hour</button>
+        </div>
+      </section>
+
+      <section id="panel-pantry" class="panel" data-testid="panel-pantry">
+        <h1>Pantry</h1>
+        <p class="muted">Fresh water is always free. Bark Break is a game, not feeding advice.</p>
+        <div class="card">
+          <p class="metric"><span>Fresh water</span><span>Always free</span></p>
+          <button type="button" class="btn secondary" data-care="water">Refill bowl</button>
+        </div>
+        <div class="card">
+          <p class="metric"><span>Kibble bowl</span><span>Daily meal</span></p>
+          <button type="button" class="btn secondary" data-care="feed">Serve kibble</button>
+        </div>
+        <div class="card">
+          <p class="metric"><span>Pumpkin biscuit</span><span>Fantasy treat</span></p>
+          <p class="muted">Virtual item — not feeding advice.</p>
+        </div>
+      </section>
+
+      <section id="panel-toys" class="panel" data-testid="panel-toys">
+        <h1>Toy box</h1>
+        <div id="toy-list" class="stack"></div>
+      </section>
+
+      <section id="panel-scrapbook" class="panel" data-testid="panel-scrapbook">
+        <h1>Scrapbook</h1>
+        <div class="card" id="scrapbook-card"></div>
+      </section>
+
+      <section id="panel-settings" class="panel" data-testid="panel-settings">
+        <h1>Quick settings</h1>
+        <div class="stack">
+          <a class="btn secondary" href="options.html" target="_blank" rel="noreferrer">Open full settings</a>
+          <button type="button" class="btn ghost" id="open-onboarding">Replay onboarding</button>
+        </div>
+      </section>
+
+      <nav class="nav" aria-label="Kennel">
+        <button type="button" class="nav-btn" data-panel="home" aria-current="page">Home</button>
+        <button type="button" class="nav-btn" data-panel="pantry">Pantry</button>
+        <button type="button" class="nav-btn" data-panel="toys">Toys</button>
+        <button type="button" class="nav-btn" data-panel="scrapbook">Scrapbook</button>
+        <button type="button" class="nav-btn" data-panel="settings">Settings</button>
+      </nav>
+    </main>
+    <script src="shared.js"></script>
+    <script src="sidepanel.js"></script>
+  </body>
+</html>

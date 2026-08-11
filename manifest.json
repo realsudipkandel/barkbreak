@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "Bark Break",
+  "version": "1.0.0",
+  "description": "A funny virtual dog who guards distracting sites, reminds you to pause, and grows through healthy breaks.",
+  "homepage_url": "https://github.com/realsudipkandel/barkbreak",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Bark Break — Biscuit is on duty",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "options_page": "options.html",
+  "permissions": [
+    "storage",
+    "alarms",
+    "sidePanel",
+    "scripting",
+    "activeTab"
+  ],
+  "optional_permissions": [
+    "notifications"
+  ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

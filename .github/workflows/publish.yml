@@ -1,0 +1,26 @@
+name: Package and publish Chrome extension
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    uses: realsudipkandel/real-cws-workflows/.github/workflows/publish-chrome-extension.yml@v1
+    secrets:
+      CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
+      CWS_CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
+      CWS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
+    with:
+      package_command: bash scripts/package-extension.sh
+      artifact_glob: dist/*.zip
+      manifest_path: manifest.json
+      node_version: ''
+      extension_id: ${{ vars.CWS_EXTENSION_ID }}
+      publisher_id: ${{ vars.CWS_PUBLISHER_ID }}
+      publish_to_chrome_web_store: true

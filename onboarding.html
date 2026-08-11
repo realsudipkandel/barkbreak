@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Meet your dog — Bark Break</title>
+    <link rel="stylesheet" href="theme.css" />
+  </head>
+  <body>
+    <main class="app" data-testid="onboarding-app">
+      <section id="step-1" class="panel active" data-testid="step-meet">
+        <div class="dog-scene coat-golden" aria-hidden="true">
+          <svg class="dog-svg" viewBox="0 0 180 160">
+            <ellipse cx="90" cy="120" rx="48" ry="28" fill="var(--dog-fill)" stroke="#18324A" stroke-width="4"/>
+            <circle cx="90" cy="78" r="36" fill="var(--dog-fill)" stroke="#18324A" stroke-width="4"/>
+            <ellipse cx="58" cy="54" rx="14" ry="20" fill="var(--dog-ear)" stroke="#18324A" stroke-width="4"/>
+            <ellipse cx="122" cy="54" rx="14" ry="20" fill="var(--dog-ear)" stroke="#18324A" stroke-width="4"/>
+            <circle cx="78" cy="78" r="4" fill="#18324A"/>
+            <circle cx="102" cy="78" r="4" fill="#18324A"/>
+            <ellipse cx="90" cy="90" rx="7" ry="4" fill="#18324A"/>
+            <path d="M40 40 H140 V70" fill="none" stroke="#18324A" stroke-width="4"/>
+          </svg>
+        </div>
+        <h1>A nose at the gate</h1>
+        <p class="lead">A dog would like a job guarding your breaks.</p>
+        <button type="button" class="btn" id="meet-dog" data-testid="meet-dog">Meet your dog</button>
+      </section>
+
+      <section id="step-2" class="panel" data-testid="step-adopt">
+        <h1>Adoption</h1>
+        <p class="lead muted">Biscuit is only a suggestion. The dog has not completed the paperwork.</p>
+        <div class="stack">
+          <label class="field">Name
+            <input id="dog-name" maxlength="24" value="Biscuit" data-testid="dog-name" />
+          </label>
+          <div>
+            <p class="metric"><span>Coat</span></p>
+            <div class="row" id="coat-choices"></div>
+          </div>
+          <div>
+            <p class="metric"><span>Ears</span></p>
+            <div class="row" id="ear-choices"></div>
+          </div>
+          <div>
+            <p class="metric"><span>Personality</span></p>
+            <div class="row" id="personality-choices"></div>
+          </div>
+          <label class="field">Pronouns
+            <select id="pronouns" data-testid="pronouns">
+              <option value="they">they / them</option>
+              <option value="he">he / him</option>
+              <option value="she">she / her</option>
+              <option value="name">use name only</option>
+            </select>
+          </label>
+          <label class="field">Motion
+            <select id="motion" data-testid="motion">
+              <option value="full">Full</option>
+              <option value="reduced">Reduced</option>
+              <option value="static">Static</option>
+            </select>
+          </label>
+          <label class="field">Sound
+            <select id="sound" data-testid="sound">
+              <option value="off">Off</option>
+              <option value="on">On</option>
+            </select>
+          </label>
+        </div>
+        <div class="row" style="margin-top: 12px">
+          <button type="button" class="btn" id="to-promise" data-testid="to-promise">Continue</button>
+        </div>
+      </section>
+
+      <section id="step-3" class="panel" data-testid="step-promise">
+        <h1>The promise</h1>
+        <div class="stack">
+          <article class="card">Your dog cannot die, leave, or lose affection.</article>
+          <article class="card">Your browsing history stays on this device.</article>
+          <article class="card">Urgent-use passes are always available.</article>
+        </div>
+        <button type="button" class="btn" id="to-gate" data-testid="sounds-kind">Sounds kind</button>
+      </section>
+
+      <section id="step-4" class="panel" data-testid="step-site">
+        <h1>Choose the first gate</h1>
+        <p class="lead">To cover a site with the break gate, Bark Break needs access to that site only.</p>
+        <div class="row" id="preset-sites">
+          <button type="button" class="chip" data-origin="https://www.youtube.com">Video</button>
+          <button type="button" class="chip" data-origin="https://www.reddit.com">Social</button>
+          <button type="button" class="chip" data-origin="https://news.ycombinator.com">News</button>
+          <button type="button" class="chip" data-origin="https://www.amazon.com">Shopping</button>
+        </div>
+        <label class="field" style="margin-top: 12px">Custom domain
+          <input id="custom-domain" placeholder="example.com" data-testid="custom-domain" />
+        </label>
+        <div class="row" style="margin-top: 12px">
+          <button type="button" class="btn secondary" id="guard-current" data-testid="guard-current">Guard this current site</button>
+          <button type="button" class="btn" id="to-rule" data-testid="to-rule">Continue</button>
+        </div>
+        <p class="muted" id="site-error" role="alert"></p>
+      </section>
+
+      <section id="step-5" class="panel" data-testid="step-rule">
+        <h1>Pick a starting rule</h1>
+        <div class="stack">
+          <button type="button" class="chip" data-rule="gentle" aria-pressed="true">Gentle — remind after 20 engaged minutes</button>
+          <button type="button" class="chip" data-rule="balanced" aria-pressed="false">Balanced — gate after 15 minutes</button>
+          <button type="button" class="chip" data-rule="custom" aria-pressed="false">Custom — 10 minutes, 3-minute break</button>
+        </div>
+        <button type="button" class="btn" id="to-rehearsal" data-testid="to-rehearsal" style="margin-top: 12px">Continue</button>
+      </section>
+
+      <section id="step-6" class="panel" data-testid="step-rehearsal">
+        <h1>Ten-second rehearsal</h1>
+        <div class="card">
+          <p>Fake page → warning paw → gate → break or urgent pass.</p>
+          <div class="dog-scene coat-golden" style="height: 140px">
+            <p style="padding: 16px; font-weight: 700">Biscuit has confiscated the scroll.</p>
+          </div>
+          <div class="row">
+            <span class="chip">Break</span>
+            <span class="chip">Urgent pass</span>
+          </div>
+        </div>
+        <button type="button" class="btn teal" id="finish-onboarding" data-testid="finish-onboarding">Let Biscuit start the shift</button>
+        <p class="muted" id="finish-error" role="alert"></p>
+      </section>
+    </main>
+    <script src="shared.js"></script>
+    <script src="onboarding.js"></script>
+  </body>
+</html>
