@@ -1111,33 +1111,36 @@ function buildUi() {
 
   dogWrap.addEventListener('click', function onDogClick(event) {
     event.stopPropagation();
-    unlockFunAudio();
-    if (dragging) {
-      return;
-    }
-    if (onWakeIfSleeping()) {
-      return;
-    }
-    openMenu();
+    unlockFunAudio().then(function afterUnlock() {
+      if (dragging) {
+        return;
+      }
+      if (onWakeIfSleeping()) {
+        return;
+      }
+      openMenu();
+    });
   });
 
   dogWrap.addEventListener('pointerdown', function onPointerDown(event) {
     if (event.button !== 0) {
       return;
     }
-    unlockFunAudio();
     if (event.target.closest('.bb-btn')) {
+      unlockFunAudio();
       return;
     }
     dragging = false;
     dragOffsetX = event.clientX - x;
     dogWrap.classList.add('dragging');
     dogWrap.setPointerCapture(event.pointerId);
-    if (behavior === STATE_SLEEPING) {
-      onWakeIfSleeping();
-    } else {
-      onPetVariant(ACTION_PET);
-    }
+    unlockFunAudio().then(function afterUnlock() {
+      if (behavior === STATE_SLEEPING) {
+        onWakeIfSleeping();
+      } else {
+        onPetVariant(ACTION_PET);
+      }
+    });
   });
 
   dogWrap.addEventListener('pointermove', function onPointerMove(event) {

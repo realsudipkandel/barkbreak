@@ -4,25 +4,21 @@
  * Fun lightweight sound effects via Web Audio (no media files).
  * Respects settings.sound — call sites pass enabled flag.
  *
- * Chrome blocks AudioContext until a user gesture. We never create or resume
- * the context until unlockFunAudio() runs from a click/pointerdown.
+ * Chrome autoplay policy: never create or resume AudioContext except inside
+ * unlockFunAudio(), which must run from a user gesture (click / pointerdown).
+ * playFunSound is silent until the context is running.
  */
 
 let audioContext = null;
 let audioUnlocked = false;
 
-function getAudioContext() {
-  if (!audioUnlocked) {
+function getRunningAudioContext() {
+  if (!audioUnlocked || !audioContext) {
     return null;
   }
-  if (audioContext) {
-    return audioContext;
-  }
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  if (!AudioCtx) {
+  if (audioContext.state !== 'running') {
     return null;
   }
-  audioContext = new AudioCtx();
   return audioContext;
 }
 
@@ -30,28 +26,40 @@ function unlockFunAudio() {
   if (typeof window === 'undefined') {
     return Promise.resolve(false);
   }
-  audioUnlocked = true;
-  const context = getAudioContext();
-  if (!context) {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) {
+      return Promise.resolve(false);
+    }
+    if (!audioContext) {
+      audioContext = new AudioCtx();
+    }
+  } catch (_error) {
+    audioContext = null;
     audioUnlocked = false;
     return Promise.resolve(false);
   }
-  if (context.state === 'running') {
+
+  if (audioContext.state === 'running') {
+    audioUnlocked = true;
     return Promise.resolve(true);
   }
-  return context
+
+  return audioContext
     .resume()
     .then(function onResumed() {
-      return context.state === 'running';
+      audioUnlocked = audioContext.state === 'running';
+      return audioUnlocked;
     })
     .catch(function onResumeFail() {
+      audioUnlocked = false;
       return false;
     });
 }
 
 function playTone(frequency, durationMs, type, gainValue, when) {
-  const context = getAudioContext();
-  if (!context || context.state !== 'running') {
+  const context = getRunningAudioContext();
+  if (!context) {
     return;
   }
   const startAt = when || context.currentTime;
@@ -69,8 +77,8 @@ function playTone(frequency, durationMs, type, gainValue, when) {
 }
 
 function playNoise(durationMs, gainValue) {
-  const context = getAudioContext();
-  if (!context || context.state !== 'running') {
+  const context = getRunningAudioContext();
+  if (!context) {
     return;
   }
   const length = Math.floor(context.sampleRate * (durationMs / 1000));
@@ -93,8 +101,8 @@ function playNoise(durationMs, gainValue) {
 }
 
 function playBarkFx() {
-  const context = getAudioContext();
-  if (!context || context.state !== 'running') {
+  const context = getRunningAudioContext();
+  if (!context) {
     return;
   }
   playTone(420, 90, 'square', 0.09, context.currentTime);
@@ -103,8 +111,8 @@ function playBarkFx() {
 }
 
 function playHappyFx() {
-  const context = getAudioContext();
-  if (!context || context.state !== 'running') {
+  const context = getRunningAudioContext();
+  if (!context) {
     return;
   }
   playTone(520, 80, 'sine', 0.08, context.currentTime);
@@ -113,8 +121,8 @@ function playHappyFx() {
 }
 
 function playJingleFx() {
-  const context = getAudioContext();
-  if (!context || context.state !== 'running') {
+  const context = getRunningAudioContext();
+  if (!context) {
     return;
   }
   playTone(880, 60, 'triangle', 0.06, context.currentTime);
@@ -127,8 +135,8 @@ function playCrunchFx() {
 }
 
 function playDrinkFx() {
-  const context = getAudioContext();
-  if (!context || context.state !== 'running') {
+  const context = getRunningAudioContext();
+  if (!context) {
     return;
   }
   playTone(240, 70, 'sine', 0.05, context.currentTime);
@@ -170,27 +178,10 @@ function playFunSound(kind, enabled) {
   if (!enabled) {
     return;
   }
-  if (!audioUnlocked) {
+  if (!getRunningAudioContext()) {
     return;
   }
-  const context = getAudioContext();
-  if (!context) {
-    return;
-  }
-  if (context.state === 'running') {
-    playKind(kind);
-    return;
-  }
-  context
-    .resume()
-    .then(function onResumed() {
-      if (context.state === 'running') {
-        playKind(kind);
-      }
-    })
-    .catch(function ignore() {
-      return undefined;
-    });
+  playKind(kind);
 }
 
 if (typeof module !== 'undefined' && module.exports) {
