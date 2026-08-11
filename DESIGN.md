@@ -1,37 +1,14 @@
-# Design — Bark Break
+# Design — Bark Break (browser pet)
 
-Follows the Real family [DESIGN.md](../DESIGN.md) plus the product palette from the Bark Break design brief.
+Simple realistic dog overlay. Not a productivity game.
 
-## Principles
+## Surfaces
+- Onboarding: meet Biscuit, sound/size/attention, where to appear
+- Page overlay: walking dog + speech bubbles + care menu
+- Toolbar popup: show/hide, sound, size, attention, pause, sites
 
-- Companion, not compliance officer
-- Care without guilt — no death, illness, bond loss, or absence decay
-- Breaks should reduce screen time — care phase ≤ 25 seconds
-- Autonomy visible — urgent pass always available
-- Private by default
+## Motion
+Bottom 25% of the viewport by default. Walk → look → sit/sleep loop. Drag to move. Flee typing, password fields, fullscreen.
 
-## Visual
-
-| Role | Hex |
-| --- | --- |
-| Ink | `#18324A` |
-| Cream | `#FFF6E8` |
-| Coral | `#EF6A5B` |
-| Teal | `#2A8C82` |
-| Mustard | `#E7AE32` |
-| Sky | `#B9DDF2` |
-| Plum | `#6C5B7B` |
-
-Storybook sticker art via SVG dog + thick outlines. Reduced/static motion modes replace idle animation with still poses.
-
-## Copy
-
-Short, dog-centred humour. No “failure,” “addiction,” “lazy,” or “bad human.” Personality tables live in `shared.js` (`COPY`). Simple copy mode uses direct, low-metaphor lines.
-
-## Screens
-
-1. Onboarding — meet → adopt → promise → first site → rule → rehearsal
-2. Side panel kennel — status, dog, care actions, focus/break
-3. Gate overlay — break / close / urgent / settings
-4. Break room — care → away timer → return + check-in
-5. Options — sites, quiet hours, a11y, privacy controls
+## Assets
+Transparent PNG pose frames in `assets/dog/`. Prefer filmed WebM loops when available.

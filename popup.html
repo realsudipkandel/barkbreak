@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bark Break</title>
+    <link rel="stylesheet" href="theme.css" />
+    <style>
+      body { min-width: 320px; }
+      .app { padding: 14px; }
+      .dog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+      .dog-option {
+        border: 2px solid #18324A;
+        border-radius: 12px;
+        padding: 6px;
+        background: #fff;
+        cursor: pointer;
+        text-align: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+      .dog-option[aria-pressed="true"] { background: #E7AE32; }
+      .dog-option img { height: 48px; width: auto; display: block; margin: 0 auto 4px; }
+    </style>
+  </head>
+  <body>
+    <main class="app" data-testid="popup-app">
+      <h1 style="font-size: 1.2rem; margin-bottom: 4px" id="title-name">Biscuit</h1>
+      <p class="muted" id="status-line">Loading…</p>
+      <section class="stack" style="margin-top: 10px; padding: 10px; border: 2px solid #18324A; border-radius: 14px; background: #fff8ee">
+        <p style="margin: 0; font-weight: 800" id="collection-title" data-testid="collection-title">Biscuit’s Important Possessions: 0/20</p>
+        <p class="muted" id="collection-list" data-testid="collection-list" style="margin: 6px 0 0; font-size: 0.8rem">Nothing found yet. Try walkies.</p>
+        <p class="muted" id="mood-line" data-testid="mood-line" style="margin: 6px 0 0">Mood: Curious</p>
+      </section>
+      <div class="stack" style="margin-top: 10px">
+        <label class="field">Name
+          <input id="dog-name" maxlength="20" data-testid="dog-name" />
+        </label>
+        <label class="field">Personality
+          <select id="personality" data-testid="personality">
+            <option value="calm">Calm</option>
+            <option value="playful">Playful</option>
+            <option value="goofy">Goofy</option>
+            <option value="dramatic">Dramatic</option>
+          </select>
+        </label>
+        <div>
+          <p class="muted" style="margin: 0 0 6px">Dog type</p>
+          <div class="dog-grid" id="dog-type-grid" data-testid="dog-type-grid"></div>
+        </div>
+        <label><input type="checkbox" id="visible" data-testid="visible" /> Show on pages</label>
+        <label><input type="checkbox" id="sound" data-testid="sound" /> Fun sounds</label>
+        <button type="button" class="btn ghost" id="preview-sound" data-testid="preview-sound">Preview bark</button>
+        <label class="field">Size
+          <select id="size" data-testid="size">
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+          </select>
+        </label>
+        <label class="field">Ask for attention every
+          <select id="popup-minutes" data-testid="popup-minutes">
+            <option value="5">5 minutes</option>
+            <option value="10">10 minutes</option>
+            <option value="15">15 minutes</option>
+            <option value="30">30 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60">60 minutes</option>
+          </select>
+        </label>
+        <label class="field">Appear on page after
+          <select id="appear-delay" data-testid="appear-delay">
+            <option value="0">Immediately</option>
+            <option value="5">5 seconds</option>
+            <option value="15">15 seconds</option>
+            <option value="30">30 seconds</option>
+          </select>
+        </label>
+        <label class="field">Max asks per day
+          <select id="freq" data-testid="freq">
+            <option value="rare">Few (2)</option>
+            <option value="default">Some (4)</option>
+            <option value="often">More (8)</option>
+          </select>
+        </label>
+        <button type="button" class="btn secondary" id="pause" data-testid="pause">Pause 1 hour</button>
+        <button type="button" class="btn ghost" id="resume" data-testid="resume">Resume</button>
+        <button type="button" class="btn ghost" id="reset" data-testid="reset">Reset hunger</button>
+        <button type="button" class="btn" id="sites" data-testid="sites">Choose websites</button>
+      </div>
+      <p class="muted" id="save-msg" role="status"></p>
+    </main>
+    <script src="shared.js"></script>
+    <script src="excitement.js"></script>
+    <script src="sounds.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
