@@ -57,8 +57,8 @@ Bark Break supports intentional browser breaks through a virtual dog companion, 
 | `sidePanel` | Gives your dog a persistent home beside the current page. |
 | `scripting` | Adds the warning paw and break gate to sites you approve. |
 | `activeTab` | Lets you choose “guard this site” from the toolbar / onboarding. |
+| `notifications` | Announces the end of a break or focus session only if the user enables optional notifications. |
 | Optional host access | Requested one site at a time so Bark Break can measure engaged time and display the gate there. |
-| Optional `notifications` | Announces the end of a break or focus session only if enabled. |
 
 ## Design guidelines
 
