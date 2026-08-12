@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Meet your dog — Bark Break</title>
+    <title>Meet Kabs — Paw Pause</title>
     <link rel="stylesheet" href="theme.css" />
     <style>
       .dog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -24,9 +24,9 @@
   <body>
     <main class="app" data-testid="onboarding-app">
       <section id="step-1" class="panel active">
-        <img id="hero-dog" src="assets/dog/sit.png" alt="" style="height: 180px; display: block; margin: 0 auto" />
-        <h1>Meet your dog</h1>
-        <p class="lead">A good dog would like to live in your browser.</p>
+        <img id="hero-dog" src="assets/cat/sit.png" alt="" style="height: 180px; display: block; margin: 0 auto; filter: brightness(0.22) contrast(1.45) saturate(0.15)" />
+        <h1>Meet Kabs</h1>
+        <p class="lead">A good companion would like to live in your browser.</p>
         <button type="button" class="btn" id="start" data-testid="start">Continue</button>
       </section>
 
@@ -34,16 +34,16 @@
         <h1>Name & look</h1>
         <div class="stack">
           <label class="field">Name
-            <input id="dog-name" maxlength="20" value="Biscuit" data-testid="dog-name" />
+            <input id="dog-name" maxlength="20" value="Kabs" data-testid="dog-name" />
           </label>
           <div>
-            <p class="muted">Dog type</p>
+            <p class="muted">Look</p>
             <div class="dog-grid" id="dog-type-grid"></div>
           </div>
           <label class="field">Fun sounds
             <select id="sound" data-testid="sound">
               <option value="off">Off</option>
-              <option value="on">On</option>
+              <option value="on" selected>On</option>
             </select>
           </label>
           <label class="field">Size
@@ -84,7 +84,7 @@
 
       <section id="step-3" class="panel">
         <h1>Where may they appear?</h1>
-        <p class="lead">Bark Break only runs on sites you approve. It does not read page content.</p>
+        <p class="lead">Paw Pause only runs on sites you approve. It does not read page content.</p>
         <div class="stack">
           <button type="button" class="chip" data-scope="selected" aria-pressed="true">Websites I choose</button>
           <button type="button" class="chip" data-scope="all" aria-pressed="false">All websites</button>

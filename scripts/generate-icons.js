@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * Minimal PNG writer for Bark Break icons (no native deps).
- * Draws a cream rounded square, teal gate, mustard dog head.
+ * Minimal PNG writer for Paw Pause icons (no native deps).
+ * Cream tile + bold teal paw print (reads at 16px).
  */
 
 const fs = require('node:fs');
@@ -16,8 +16,8 @@ const SIZES = [16, 32, 48, 128];
 const INK = [24, 50, 74, 255];
 const CREAM = [255, 246, 232, 255];
 const CORAL = [239, 106, 91, 255];
-const MUSTARD = [231, 174, 50, 255];
 const TEAL = [42, 140, 130, 255];
+const TEAL_DARK = [28, 110, 102, 255];
 const CLEAR = [0, 0, 0, 0];
 
 function crc32(buf) {
@@ -103,6 +103,31 @@ function fillCircle(rgba, size, cx, cy, radius, color) {
   }
 }
 
+function fillEllipse(rgba, size, cx, cy, radiusX, radiusY, color) {
+  const rx2 = radiusX * radiusX;
+  const ry2 = radiusY * radiusY;
+  for (let y = Math.floor(cy - radiusY); y <= Math.ceil(cy + radiusY); y += 1) {
+    for (let x = Math.floor(cx - radiusX); x <= Math.ceil(cx + radiusX); x += 1) {
+      const dx = x - cx;
+      const dy = y - cy;
+      if (rx2 > 0 && ry2 > 0 && (dx * dx) / rx2 + (dy * dy) / ry2 <= 1) {
+        setPixel(rgba, size, x, y, color);
+      }
+    }
+  }
+}
+
+function drawPaw(rgba, size, cx, cy, scale, color) {
+  const toeR = Math.max(1.2, scale * 0.2);
+  const padRx = Math.max(2, scale * 0.4);
+  const padRy = Math.max(2, scale * 0.34);
+  fillEllipse(rgba, size, cx, cy + scale * 0.22, padRx, padRy, color);
+  fillCircle(rgba, size, cx - scale * 0.46, cy - scale * 0.22, toeR, color);
+  fillCircle(rgba, size, cx - scale * 0.16, cy - scale * 0.4, toeR * 1.05, color);
+  fillCircle(rgba, size, cx + scale * 0.16, cy - scale * 0.4, toeR * 1.05, color);
+  fillCircle(rgba, size, cx + scale * 0.46, cy - scale * 0.22, toeR, color);
+}
+
 function drawIcon(size) {
   const rgba = Buffer.alloc(size * size * 4);
   for (let index = 0; index < rgba.length; index += 4) {
@@ -114,26 +139,37 @@ function drawIcon(size) {
 
   const margin = Math.max(1, Math.floor(size / 16));
   fillRect(rgba, size, margin, margin, size - margin, size - margin, CREAM);
-  fillRect(rgba, size, margin, margin, size - margin, margin + 1, INK);
-  fillRect(rgba, size, margin, size - margin - 1, size - margin, size - margin, INK);
-  fillRect(rgba, size, margin, margin, margin + 1, size - margin, INK);
-  fillRect(rgba, size, size - margin - 1, margin, size - margin, size - margin, INK);
+  fillRect(rgba, size, margin, margin, size - margin, margin + Math.max(1, Math.floor(size / 48)), INK);
+  fillRect(
+    rgba,
+    size,
+    margin,
+    size - margin - Math.max(1, Math.floor(size / 48)),
+    size - margin,
+    size - margin,
+    INK,
+  );
+  fillRect(rgba, size, margin, margin, margin + Math.max(1, Math.floor(size / 48)), size - margin, INK);
+  fillRect(
+    rgba,
+    size,
+    size - margin - Math.max(1, Math.floor(size / 48)),
+    margin,
+    size - margin,
+    size - margin,
+    INK,
+  );
 
-  const postW = Math.max(2, Math.floor(size / 14));
-  const gateTop = Math.floor(size * 0.55);
-  fillRect(rgba, size, size * 0.22, gateTop, size * 0.22 + postW, size * 0.86, TEAL);
-  fillRect(rgba, size, size * 0.72, gateTop, size * 0.72 + postW, size * 0.86, TEAL);
-  fillRect(rgba, size, size * 0.22, size * 0.68, size * 0.78, size * 0.68 + postW, TEAL);
-
-  const headR = size * 0.22;
   const cx = size / 2;
-  const cy = size * 0.38;
-  fillCircle(rgba, size, cx, cy, headR, MUSTARD);
-  fillCircle(rgba, size, cx - headR * 0.85, cy - headR * 0.35, headR * 0.35, CORAL);
-  fillCircle(rgba, size, cx + headR * 0.85, cy - headR * 0.35, headR * 0.35, CORAL);
-  fillCircle(rgba, size, cx - headR * 0.35, cy, Math.max(1, size * 0.035), INK);
-  fillCircle(rgba, size, cx + headR * 0.35, cy, Math.max(1, size * 0.035), INK);
-  fillCircle(rgba, size, cx, cy + headR * 0.25, Math.max(1, size * 0.045), INK);
+  const cy = size * 0.46;
+  const scale = size * 0.34;
+  drawPaw(rgba, size, cx + 0.5, cy + 0.5, scale, TEAL_DARK);
+  drawPaw(rgba, size, cx, cy, scale, TEAL);
+
+  if (size >= 32) {
+    const accentR = Math.max(1, size * 0.035);
+    fillCircle(rgba, size, cx + scale * 0.16, cy - scale * 0.4, accentR, CORAL);
+  }
 
   return encodePng(size, size, rgba);
 }

@@ -1,9 +1,9 @@
 'use strict';
 
 const draft = {
-  dogName: 'Biscuit',
-  dogType: DOG_GOLDEN,
-  sound: false,
+  dogName: 'Kabs',
+  dogType: DOG_BLACK_CAT,
+  sound: true,
   size: SIZE_MEDIUM,
   popupMinutes: 30,
   appearDelaySeconds: 5,
@@ -38,10 +38,13 @@ function renderDogTypes() {
     button.type = 'button';
     button.className = 'dog-option';
     button.setAttribute('aria-pressed', dogType.id === draft.dogType ? 'true' : 'false');
-    button.innerHTML = `<img src="assets/dog/sit.png" alt="" style="filter:${dogType.filter}" /><span>${dogType.label}</span>`;
+    const previewSrc = companionPreviewSrc(dogType.id);
+    button.innerHTML = `<img src="${previewSrc}" alt="" style="filter:${dogType.filter}" /><span>${dogType.label}</span>`;
     button.addEventListener('click', function onPick() {
       draft.dogType = dogType.id;
-      document.getElementById('hero-dog').style.filter = dogType.filter;
+      const hero = document.getElementById('hero-dog');
+      hero.src = companionPreviewSrc(dogType.id);
+      hero.style.filter = dogType.filter || 'none';
       renderDogTypes();
     });
     grid.appendChild(button);
@@ -53,7 +56,7 @@ document.getElementById('start').addEventListener('click', function onStart() {
 });
 
 document.getElementById('to-sites').addEventListener('click', function onSites() {
-  draft.dogName = document.getElementById('dog-name').value.trim() || 'Biscuit';
+  draft.dogName = document.getElementById('dog-name').value.trim() || 'Kabs';
   draft.sound = document.getElementById('sound').value === 'on';
   draft.size = document.getElementById('size').value;
   draft.popupMinutes = Number(document.getElementById('popup-minutes').value);
@@ -132,4 +135,12 @@ document.getElementById('finish').addEventListener('click', function onFinish() 
   });
 });
 
+function syncHeroLook() {
+  const dogType = getDogType(draft.dogType);
+  const hero = document.getElementById('hero-dog');
+  hero.src = companionPreviewSrc(dogType.id);
+  hero.style.filter = dogType.filter || 'none';
+}
+
 renderDogTypes();
+syncHeroLook();

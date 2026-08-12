@@ -1,6 +1,6 @@
 'use strict';
 
-let selectedDogType = DOG_GOLDEN;
+let selectedDogType = DOG_BLACK_CAT;
 
 function send(type, payload) {
   return new Promise(function resolveSend(resolve) {
@@ -25,7 +25,7 @@ function moodLabel(mood) {
 
 function renderCollection(state) {
   const progress = collectionProgress(state.excitement || createDefaultExcitement(Date.now()));
-  const name = state.settings.dogName || 'Biscuit';
+  const name = state.settings.dogName || 'Kabs';
   document.getElementById('collection-title').textContent =
     `${name}’s Important Possessions: ${progress.owned}/${progress.total}`;
   if (progress.owned === 0) {
@@ -53,7 +53,8 @@ function renderDogTypes(selectedId) {
     button.className = 'dog-option';
     button.setAttribute('aria-pressed', dogType.id === selectedId ? 'true' : 'false');
     button.setAttribute('data-testid', `dog-type-${dogType.id}`);
-    button.innerHTML = `<img src="assets/dog/sit.png" alt="" style="filter:${dogType.filter}" /><span>${dogType.label}</span>`;
+    const previewSrc = companionPreviewSrc(dogType.id);
+    button.innerHTML = `<img src="${previewSrc}" alt="" style="filter:${dogType.filter}" /><span>${dogType.label}</span>`;
     button.addEventListener('click', function onPick() {
       selectedDogType = dogType.id;
       renderDogTypes(dogType.id);
@@ -117,8 +118,31 @@ document.getElementById('appear-delay').addEventListener('change', saveSettings)
 document.getElementById('freq').addEventListener('change', saveSettings);
 
 document.getElementById('preview-sound').addEventListener('click', function onPreview() {
-  unlockFunAudio().then(function onUnlocked() {
-    playFunSound('bark', true);
+  const soundToggle = document.getElementById('sound');
+  const status = document.getElementById('save-msg');
+  if (!soundToggle.checked) {
+    soundToggle.checked = true;
+    saveSettings();
+  }
+  status.textContent = 'Unlocking sound…';
+  unlockFunAudio().then(function onUnlocked(ready) {
+    if (!ready) {
+      status.textContent = 'Could not start audio — click Preview again';
+      return;
+    }
+    const species = companionSoundSpecies(selectedDogType);
+    if (species === 'cat' && typeof loadMeowSampleBuffers === 'function') {
+      status.textContent = 'Loading meows…';
+      loadMeowSampleBuffers().then(function onSamples() {
+        const played = playFunSound('bark', true, species);
+        status.textContent = played ? 'Playing meow…' : 'Audio ready but playback failed — click again';
+      });
+      return;
+    }
+    const played = playFunSound('bark', true, species);
+    status.textContent = played
+      ? 'Playing bark…'
+      : 'Audio ready but playback failed — click again';
   });
 });
 

@@ -41,7 +41,7 @@ async function registerAllScripts(state) {
     {
       id: CONTENT_SCRIPT_ID,
       matches: matches,
-          js: ['shared.js', 'excitement.js', 'sounds.js', 'content.js'],
+          js: ['shared.js', 'excitement.js', 'meow-samples.js', 'sounds.js', 'content.js'],
       runAt: 'document_idle',
       persistAcrossSessions: true,
     },
@@ -60,7 +60,7 @@ async function injectIntoOrigin(origin) {
       try {
         await chrome.scripting.executeScript({
           target: { tabId: tab.id },
-          files: ['shared.js', 'excitement.js', 'sounds.js', 'content.js'],
+          files: ['shared.js', 'excitement.js', 'meow-samples.js', 'sounds.js', 'content.js'],
         });
       } catch (_error) {
         // Restricted tab.
@@ -68,6 +68,35 @@ async function injectIntoOrigin(origin) {
     }
   } catch (_error) {
     // No permission yet.
+  }
+}
+
+async function injectIntoMatchedTabs(state) {
+  const current = state || (await readState());
+  if (current.settings.scope === SCOPE_ALL) {
+    try {
+      const tabs = await chrome.tabs.query({ url: ['http://*/*', 'https://*/*'] });
+      for (let index = 0; index < tabs.length; index += 1) {
+        const tab = tabs[index];
+        if (typeof tab.id !== 'number' || !tab.url || isRestrictedUrl(tab.url)) {
+          continue;
+        }
+        try {
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['shared.js', 'excitement.js', 'meow-samples.js', 'sounds.js', 'content.js'],
+          });
+        } catch (_error) {
+          // Restricted or discarded tab.
+        }
+      }
+    } catch (_error) {
+      // Missing broad host permission.
+    }
+    return;
+  }
+  for (let index = 0; index < current.sites.length; index += 1) {
+    await injectIntoOrigin(current.sites[index]);
   }
 }
 
@@ -295,6 +324,9 @@ async function bootInstall(details) {
   await registerAllScripts(state);
   if (details.reason === 'install' && !state.settings.onboardingComplete) {
     await chrome.tabs.create({ url: chrome.runtime.getURL('onboarding.html') });
+  }
+  if (details.reason === 'update' || details.reason === 'install') {
+    await injectIntoMatchedTabs(state);
   }
 }
 

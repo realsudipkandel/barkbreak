@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate Bark Break icons — dog head above a small garden gate."""
+"""Generate Paw Pause icons — teal paw on cream tile."""
 
 from __future__ import annotations
 

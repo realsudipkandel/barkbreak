@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Bark Break",
-  "version": "2.2.0",
-  "description": "A real dog that lives on your websites — walks, plays, finds treasures, remembers how you care, and occasionally causes harmless chaos.",
+  "name": "Paw Pause",
+  "version": "2.4.4",
+  "description": "Calm virtual companion for sites you approve. Care, play, walk, and keep finds on-device — no account or ads.",
   "homepage_url": "https://github.com/realsudipkandel/barkbreak",
   "icons": {
     "16": "icons/icon-16.png",
@@ -11,7 +11,7 @@
     "128": "icons/icon-128.png"
   },
   "action": {
-    "default_title": "Bark Break — Biscuit",
+    "default_title": "Paw Pause — Kabs",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon-16.png",
@@ -37,7 +37,9 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "assets/dog/*"
+        "assets/dog/*",
+        "assets/cat/*",
+        "assets/sounds/meow/*"
       ],
       "matches": [
         "http://*/*",

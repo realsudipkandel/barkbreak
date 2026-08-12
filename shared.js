@@ -21,16 +21,70 @@ const DOG_CHOCOLATE = 'chocolate';
 const DOG_BLACK = 'black';
 const DOG_CREAM = 'cream';
 const DOG_FOX = 'fox';
+const DOG_GINGER_CAT = 'ginger_brit';
+const DOG_BLACK_CAT = 'black_cat';
+const DOG_BW_CAT = 'bw_cat';
+
+const ASSET_FOLDER_DOG = 'dog';
+const ASSET_FOLDER_CAT = 'cat';
+
+const DEFAULT_DOG_NAME = 'Kabs';
+const CAT_HEIGHT_SCALE = 1.55;
 
 const POPUP_MINUTES_OPTIONS = Object.freeze([5, 10, 15, 30, 45, 60]);
 const APPEAR_DELAY_OPTIONS = Object.freeze([0, 5, 15, 30]);
 
 const DOG_TYPES = Object.freeze([
-  { id: DOG_GOLDEN, label: 'Golden retriever', filter: 'none' },
-  { id: DOG_CHOCOLATE, label: 'Chocolate lab', filter: 'brightness(0.78) sepia(0.35) hue-rotate(-18deg) saturate(1.15)' },
-  { id: DOG_BLACK, label: 'Black lab', filter: 'brightness(0.38) contrast(1.25) saturate(0.35)' },
-  { id: DOG_CREAM, label: 'Cream', filter: 'brightness(1.28) saturate(0.45) contrast(0.95)' },
-  { id: DOG_FOX, label: 'Fox red', filter: 'hue-rotate(-18deg) saturate(1.45) brightness(0.95)' },
+  { id: DOG_GOLDEN, label: 'Golden retriever', filter: 'none', assetFolder: ASSET_FOLDER_DOG, heightScale: 1 },
+  {
+    id: DOG_CHOCOLATE,
+    label: 'Chocolate lab',
+    filter: 'brightness(0.78) sepia(0.35) hue-rotate(-18deg) saturate(1.15)',
+    assetFolder: ASSET_FOLDER_DOG,
+    heightScale: 1,
+  },
+  {
+    id: DOG_BLACK,
+    label: 'Black lab',
+    filter: 'brightness(0.38) contrast(1.25) saturate(0.35)',
+    assetFolder: ASSET_FOLDER_DOG,
+    heightScale: 1,
+  },
+  {
+    id: DOG_CREAM,
+    label: 'Cream',
+    filter: 'brightness(1.28) saturate(0.45) contrast(0.95)',
+    assetFolder: ASSET_FOLDER_DOG,
+    heightScale: 1,
+  },
+  {
+    id: DOG_FOX,
+    label: 'Fox red',
+    filter: 'hue-rotate(-18deg) saturate(1.45) brightness(0.95)',
+    assetFolder: ASSET_FOLDER_DOG,
+    heightScale: 1,
+  },
+  {
+    id: DOG_GINGER_CAT,
+    label: 'Ginger British Shorthair',
+    filter: 'none',
+    assetFolder: ASSET_FOLDER_CAT,
+    heightScale: CAT_HEIGHT_SCALE,
+  },
+  {
+    id: DOG_BLACK_CAT,
+    label: 'Black cat',
+    filter: 'brightness(0.22) contrast(1.45) saturate(0.15)',
+    assetFolder: ASSET_FOLDER_CAT,
+    heightScale: CAT_HEIGHT_SCALE,
+  },
+  {
+    id: DOG_BW_CAT,
+    label: 'Black & white cat',
+    filter: 'grayscale(1) contrast(1.28) brightness(1.05)',
+    assetFolder: ASSET_FOLDER_CAT,
+    heightScale: CAT_HEIGHT_SCALE,
+  },
 ]);
 
 const STATE_WALKING = 'walking';
@@ -175,10 +229,10 @@ function isRestrictedUrl(urlString) {
 
 function normalizeDogName(value) {
   if (typeof value !== 'string') {
-    return 'Biscuit';
+    return DEFAULT_DOG_NAME;
   }
   const trimmed = value.trim().slice(0, 20);
-  return trimmed.length > 0 ? trimmed : 'Biscuit';
+  return trimmed.length > 0 ? trimmed : DEFAULT_DOG_NAME;
 }
 
 function getDogType(typeId) {
@@ -190,12 +244,29 @@ function getDogType(typeId) {
   return DOG_TYPES[0];
 }
 
+function companionAssetFolder(typeId) {
+  const dogType = getDogType(typeId);
+  return dogType.assetFolder || ASSET_FOLDER_DOG;
+}
+
+function isCatCompanion(typeId) {
+  return companionAssetFolder(typeId) === ASSET_FOLDER_CAT;
+}
+
+function companionSoundSpecies(typeId) {
+  return isCatCompanion(typeId) ? 'cat' : 'dog';
+}
+
+function companionPreviewSrc(typeId) {
+  return `assets/${companionAssetFolder(typeId)}/sit.png`;
+}
+
 function createDefaultSettings() {
   return {
-    dogName: 'Biscuit',
-    dogType: DOG_GOLDEN,
+    dogName: DEFAULT_DOG_NAME,
+    dogType: DOG_BLACK_CAT,
     personality: 'goofy',
-    sound: false,
+    sound: true,
     size: SIZE_MEDIUM,
     attentionFrequency: FREQ_DEFAULT,
     popupMinutes: 30,
@@ -398,18 +469,248 @@ function isFull(state, nowMs) {
   return typeof state.fullUntil === 'number' && state.fullUntil > nowMs;
 }
 
-function dogHeightForSize(size) {
-  return SIZE_PX[size] || SIZE_PX[SIZE_MEDIUM];
+const WALK_STEP_PX = 22;
+const WALK_BOB_AMPLITUDE_PX = 3.2;
+const POINTER_LEAN_MAX_DEG = 7;
+const IDLE_BREATH_PERIOD_MS = 2800;
+
+function walkFrameIndex(distancePx, frameCount, stepPx) {
+  const step = typeof stepPx === 'number' && stepPx > 0 ? stepPx : WALK_STEP_PX;
+  const count = Math.max(1, Math.floor(Number(frameCount) || 1));
+  const distance = Math.max(0, Number(distancePx) || 0);
+  return Math.floor(distance / step) % count;
+}
+
+function walkBobOffset(distancePx, stepPx, amplitudePx) {
+  const step = typeof stepPx === 'number' && stepPx > 0 ? stepPx : WALK_STEP_PX;
+  const amplitude =
+    typeof amplitudePx === 'number' ? amplitudePx : WALK_BOB_AMPLITUDE_PX;
+  const distance = Math.max(0, Number(distancePx) || 0);
+  const cycleLength = step * 4;
+  const phase = (distance / cycleLength) * Math.PI * 2;
+  return Math.sin(phase) * amplitude;
+}
+
+function pointerLeanDegrees(deltaX, deltaY, maxTiltDeg) {
+  const maxTilt =
+    typeof maxTiltDeg === 'number' ? maxTiltDeg : POINTER_LEAN_MAX_DEG;
+  const offsetX = Number(deltaX) || 0;
+  const offsetY = Number(deltaY) || 0;
+  const leanY = Math.max(-1, Math.min(1, offsetX / 280)) * maxTilt;
+  const leanX = Math.max(-1, Math.min(1, offsetY / 220)) * (maxTilt * 0.55);
+  return Object.freeze({
+    rotateY: leanY,
+    rotateX: -leanX,
+  });
+}
+
+function contactShadowStyle(liftPx, maxLiftPx) {
+  const maxLift = typeof maxLiftPx === 'number' && maxLiftPx > 0 ? maxLiftPx : 220;
+  const lift = Math.max(0, Number(liftPx) || 0);
+  const progress = Math.min(1, lift / maxLift);
+  return Object.freeze({
+    scaleX: 1 - progress * 0.45,
+    scaleY: 1 - progress * 0.35,
+    opacity: 0.38 * (1 - progress * 0.78),
+  });
+}
+
+function idleBreathScale(nowMs, periodMs) {
+  const period =
+    typeof periodMs === 'number' && periodMs > 0 ? periodMs : IDLE_BREATH_PERIOD_MS;
+  const now = Math.max(0, Number(nowMs) || 0);
+  const phase = ((now % period) / period) * Math.PI * 2;
+  return 1 + Math.sin(phase) * 0.014;
+}
+
+function facingTowardPointer(companionCenterX, pointerX, currentFacing, deadZonePx) {
+  const deadZone = typeof deadZonePx === 'number' ? deadZonePx : 48;
+  const centerX = Number(companionCenterX) || 0;
+  const pointer = Number(pointerX) || 0;
+  const facing = currentFacing >= 0 ? 1 : -1;
+  if (pointer < centerX - deadZone) {
+    return -1;
+  }
+  if (pointer > centerX + deadZone) {
+    return 1;
+  }
+  return facing;
+}
+
+function walkBoundsForViewport(viewportWidth, companionWidth, marginPx) {
+  const margin = typeof marginPx === 'number' ? marginPx : 8;
+  const width = Math.max(1, Number(companionWidth) || 120);
+  const viewport = Math.max(0, Number(viewportWidth) || 0);
+  const minX = margin;
+  const maxX = Math.max(minX, viewport - width - margin);
+  return { minX: minX, maxX: maxX };
+}
+
+function resolveWalkEdgeBounce(positionX, currentFacing, minX, maxX) {
+  const facing = currentFacing >= 0 ? 1 : -1;
+  const left = Number(minX);
+  const right = Number(maxX);
+  let nextX = Number(positionX);
+  if (!Number.isFinite(nextX)) {
+    nextX = left;
+  }
+  if (nextX >= right) {
+    return {
+      x: right,
+      facing: facing > 0 ? -1 : facing,
+      turned: facing > 0,
+    };
+  }
+  if (nextX <= left) {
+    return {
+      x: left,
+      facing: facing < 0 ? 1 : facing,
+      turned: facing < 0,
+    };
+  }
+  return { x: nextX, facing: facing, turned: false };
+}
+
+function isExtensionContextInvalidationError(error) {
+  const message = String(
+    error && typeof error === 'object' && error.message ? error.message : error || '',
+  );
+  return /extension context invalidated/i.test(message);
+}
+
+const FETCH_PHASE_AIM = 'aim';
+const FETCH_PHASE_FLIGHT = 'flight';
+const FETCH_PHASE_CHASE = 'chase';
+const FETCH_PHASE_RETURN = 'return';
+const FETCH_PHASE_DONE = 'done';
+
+const BALL_GROUND_Y_PX = 12;
+const BALL_SIZE_PX = 18;
+const FETCH_CATCH_DISTANCE_PX = 36;
+const FETCH_RETURN_DISTANCE_PX = 40;
+const THROW_MIN_SPEED = 2.4;
+const THROW_MAX_SPEED = 22;
+
+function createBallState(positionX, positionY, velocityX, velocityY) {
+  return {
+    x: Number(positionX) || 0,
+    y: Number(positionY) || BALL_GROUND_Y_PX,
+    vx: Number(velocityX) || 0,
+    vy: Number(velocityY) || 0,
+    hops: 0,
+    settled: false,
+  };
+}
+
+function clampThrowSpeed(vx, vy, minSpeed, maxSpeed) {
+  const min = typeof minSpeed === 'number' ? minSpeed : THROW_MIN_SPEED;
+  const max = typeof maxSpeed === 'number' ? maxSpeed : THROW_MAX_SPEED;
+  const speed = Math.sqrt(vx * vx + vy * vy);
+  if (speed < min) {
+    return { vx: 0, vy: 0, tooSoft: true };
+  }
+  if (speed <= max) {
+    return { vx: vx, vy: vy, tooSoft: false };
+  }
+  const scale = max / speed;
+  return { vx: vx * scale, vy: vy * scale, tooSoft: false };
+}
+
+function throwVelocityFromDrag(fromX, fromY, toX, toY, durationMs) {
+  const duration = Math.max(16, Number(durationMs) || 16);
+  const scale = 18 / duration;
+  const rawVx = (Number(toX) - Number(fromX)) * scale;
+  const rawVy = (Number(toY) - Number(fromY)) * scale;
+  return clampThrowSpeed(rawVx, rawVy, THROW_MIN_SPEED, THROW_MAX_SPEED);
+}
+
+function defaultThrowVelocity(facing) {
+  const direction = facing >= 0 ? 1 : -1;
+  return { vx: direction * 11, vy: 8.5, tooSoft: false };
+}
+
+function stepBallPhysics(ballState, deltaMs, viewportWidth, groundY) {
+  const ball = ballState || createBallState(0, groundY || BALL_GROUND_Y_PX, 0, 0);
+  if (ball.settled) {
+    return ball;
+  }
+  const ground = typeof groundY === 'number' ? groundY : BALL_GROUND_Y_PX;
+  const width = Math.max(BALL_SIZE_PX + 8, Number(viewportWidth) || 320);
+  const step = Math.max(0, Number(deltaMs) || 0) / 30;
+  let nextX = ball.x + ball.vx * step;
+  let nextY = ball.y + ball.vy * step;
+  let nextVx = ball.vx;
+  let nextVy = ball.vy - 0.55 * step;
+  let hops = ball.hops;
+  if (nextY <= ground) {
+    nextY = ground;
+    nextVy = Math.abs(nextVy) * 0.55;
+    nextVx *= 0.82;
+    hops += 1;
+  }
+  if (nextX < 8) {
+    nextX = 8;
+    nextVx = Math.abs(nextVx) * 0.75;
+  } else if (nextX > width - BALL_SIZE_PX - 8) {
+    nextX = width - BALL_SIZE_PX - 8;
+    nextVx = -Math.abs(nextVx) * 0.75;
+  }
+  const slow = Math.abs(nextVx) < 0.55 && Math.abs(nextVy) < 0.85;
+  const settled = nextY <= ground + 0.5 && (hops >= 2 && slow || hops >= 5);
+  if (settled) {
+    nextVx = 0;
+    nextVy = 0;
+    nextY = ground;
+  }
+  return {
+    x: nextX,
+    y: nextY,
+    vx: nextVx,
+    vy: nextVy,
+    hops: hops,
+    settled: settled,
+  };
+}
+
+function stepFetchChase(companionX, ballX, speed, catchDistancePx) {
+  const catchDistance =
+    typeof catchDistancePx === 'number' ? catchDistancePx : FETCH_CATCH_DISTANCE_PX;
+  const step = Math.max(0, Number(speed) || 0);
+  const currentX = Number(companionX) || 0;
+  const targetX = Number(ballX) || 0;
+  const delta = targetX - currentX;
+  const facing = delta >= 0 ? 1 : -1;
+  if (Math.abs(delta) <= catchDistance) {
+    return { x: currentX, facing: facing, caught: true };
+  }
+  const move = Math.min(Math.abs(delta), step) * facing;
+  return { x: currentX + move, facing: facing, caught: false };
+}
+
+function stepFetchReturn(companionX, returnX, speed, arriveDistancePx) {
+  const arriveDistance =
+    typeof arriveDistancePx === 'number' ? arriveDistancePx : FETCH_RETURN_DISTANCE_PX;
+  return stepFetchChase(companionX, returnX, speed, arriveDistance);
+}
+
+function dogHeightForSize(size, typeId) {
+  const base = SIZE_PX[size] || SIZE_PX[SIZE_MEDIUM];
+  if (typeId === undefined) {
+    return base;
+  }
+  const dogType = getDogType(typeId);
+  const scale = typeof dogType.heightScale === 'number' ? dogType.heightScale : 1;
+  return Math.round(base * scale);
 }
 
 function withDogName(template, dogName) {
-  return String(template).replace(/\{name\}/g, dogName || 'Biscuit');
+  return String(template).replace(/\{name\}/g, dogName || DEFAULT_DOG_NAME);
 }
 
 function pickSpeech(kind, nowMs, dogName) {
   const lines = SPEECH[kind] || SPEECH.thanks;
   const index = Math.abs(Math.floor(nowMs / 60000)) % lines.length;
-  return withDogName(lines[index], dogName || 'Biscuit');
+  return withDogName(lines[index], dogName || DEFAULT_DOG_NAME);
 }
 
 function popupGapMs(settings) {
@@ -514,6 +815,13 @@ const api = {
   DOG_BLACK,
   DOG_CREAM,
   DOG_FOX,
+  DOG_GINGER_CAT,
+  DOG_BLACK_CAT,
+  DOG_BW_CAT,
+  ASSET_FOLDER_DOG,
+  ASSET_FOLDER_CAT,
+  DEFAULT_DOG_NAME,
+  CAT_HEIGHT_SCALE,
   POPUP_MINUTES_OPTIONS,
   APPEAR_DELAY_OPTIONS,
   DOG_TYPES,
@@ -540,6 +848,10 @@ const api = {
   isRestrictedUrl,
   normalizeDogName,
   getDogType,
+  companionAssetFolder,
+  isCatCompanion,
+  companionSoundSpecies,
+  companionPreviewSrc,
   createDefaultSettings,
   createEmptyExcitement,
   createDefaultState,
@@ -549,6 +861,37 @@ const api = {
   isQuietHours,
   isPaused,
   isFull,
+  WALK_STEP_PX,
+  WALK_BOB_AMPLITUDE_PX,
+  POINTER_LEAN_MAX_DEG,
+  IDLE_BREATH_PERIOD_MS,
+  walkFrameIndex,
+  walkBobOffset,
+  pointerLeanDegrees,
+  contactShadowStyle,
+  idleBreathScale,
+  facingTowardPointer,
+  walkBoundsForViewport,
+  resolveWalkEdgeBounce,
+  isExtensionContextInvalidationError,
+  FETCH_PHASE_AIM,
+  FETCH_PHASE_FLIGHT,
+  FETCH_PHASE_CHASE,
+  FETCH_PHASE_RETURN,
+  FETCH_PHASE_DONE,
+  BALL_GROUND_Y_PX,
+  BALL_SIZE_PX,
+  FETCH_CATCH_DISTANCE_PX,
+  FETCH_RETURN_DISTANCE_PX,
+  THROW_MIN_SPEED,
+  THROW_MAX_SPEED,
+  createBallState,
+  clampThrowSpeed,
+  throwVelocityFromDrag,
+  defaultThrowVelocity,
+  stepBallPhysics,
+  stepFetchChase,
+  stepFetchReturn,
   dogHeightForSize,
   withDogName,
   pickSpeech,

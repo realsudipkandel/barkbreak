@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Bark Break</title>
+    <title>Paw Pause</title>
     <link rel="stylesheet" href="theme.css" />
     <style>
       body { min-width: 320px; }
@@ -25,10 +25,10 @@
   </head>
   <body>
     <main class="app" data-testid="popup-app">
-      <h1 style="font-size: 1.2rem; margin-bottom: 4px" id="title-name">Biscuit</h1>
+      <h1 style="font-size: 1.2rem; margin-bottom: 4px" id="title-name">Kabs</h1>
       <p class="muted" id="status-line">Loading…</p>
       <section class="stack" style="margin-top: 10px; padding: 10px; border: 2px solid #18324A; border-radius: 14px; background: #fff8ee">
-        <p style="margin: 0; font-weight: 800" id="collection-title" data-testid="collection-title">Biscuit’s Important Possessions: 0/20</p>
+        <p style="margin: 0; font-weight: 800" id="collection-title" data-testid="collection-title">Kabs’s Important Possessions: 0/20</p>
         <p class="muted" id="collection-list" data-testid="collection-list" style="margin: 6px 0 0; font-size: 0.8rem">Nothing found yet. Try walkies.</p>
         <p class="muted" id="mood-line" data-testid="mood-line" style="margin: 6px 0 0">Mood: Curious</p>
       </section>
@@ -45,12 +45,12 @@
           </select>
         </label>
         <div>
-          <p class="muted" style="margin: 0 0 6px">Dog type</p>
+          <p class="muted" style="margin: 0 0 6px">Look</p>
           <div class="dog-grid" id="dog-type-grid" data-testid="dog-type-grid"></div>
         </div>
         <label><input type="checkbox" id="visible" data-testid="visible" /> Show on pages</label>
         <label><input type="checkbox" id="sound" data-testid="sound" /> Fun sounds</label>
-        <button type="button" class="btn ghost" id="preview-sound" data-testid="preview-sound">Preview bark</button>
+        <button type="button" class="btn ghost" id="preview-sound" data-testid="preview-sound">Preview sound</button>
         <label class="field">Size
           <select id="size" data-testid="size">
             <option value="small">Small</option>
@@ -92,6 +92,7 @@
     </main>
     <script src="shared.js"></script>
     <script src="excitement.js"></script>
+    <script src="meow-samples.js"></script>
     <script src="sounds.js"></script>
     <script src="popup.js"></script>
   </body>

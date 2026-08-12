@@ -131,6 +131,128 @@ const SPEECH_FUN = Object.freeze({
   memoryBreak: ['You normally take a break around this time.'],
 });
 
+const WALK_DISCOVERY_HOOKS = Object.freeze([
+  'Hold up —',
+  'Plot twist:',
+  'Field report:',
+  'Excuse me.',
+  'Breaking news from my nose:',
+  'I paused the mission because',
+  'Tiny victory:',
+  'Listen carefully.',
+  'Between you and me,',
+  'Urgent sniff update:',
+]);
+
+const WALK_DISCOVERY_TREATS = Object.freeze([
+  'a crumb that tastes like celebration',
+  'a treat shaped like a comma',
+  'a suspiciously perfect biscuit flake',
+  'a soft snack with main-character energy',
+  'a cheese ghost (technically crumbs)',
+  'a mint leaf pretending to be salad',
+  'a jellybean that rolled away from destiny',
+  'a cookie corner with travel stamps',
+  'a raisin that demands respect',
+  'a peanut that filed a formal complaint',
+  'a caramel that was living its best life',
+  'a fish-shaped cracker (honorary)',
+  'a yogurt drip from an alternate timeline',
+  'a toast soldier missing its army',
+  'a blueberry with classified clearance',
+  'a honey droplet on sabbatical',
+  'a pretzel knot of pure optimism',
+  'a chocolate chip practicing stealth',
+  'a rice puff that escaped breakfast',
+  'a strawberry seed with big plans',
+]);
+
+const WALK_DISCOVERY_PLACES = Object.freeze([
+  'under a loud tab',
+  'beside the scroll bar',
+  'behind a pixel that looked guilty',
+  'near the loading spinner museum',
+  'in the corner of this website',
+  'next to a very important button',
+  'between two ads that blinked first',
+  'along the bottom of the page',
+  'where the cursor used to stand',
+  'inside a shadow shaped like lunch',
+  'by the edge of the viewport',
+  'under a headline that smelled crunchy',
+]);
+
+const WALK_DISCOVERY_TWISTS = Object.freeze([
+  'I found it. Sharing is heroic.',
+  'I found a treat. You may applaud.',
+  'Treasure acquired. Morale: upgraded.',
+  'I claim this for science and snacks.',
+  'Found it first. Dibs are legal here.',
+  'I will guard it with my entire personality.',
+  'This changes everything (mildly).',
+  'Snack diplomacy begins now.',
+  'I am emotionally attached already.',
+  'Do not blink or it becomes theoretical again.',
+  'Quality rating: extremely findable.',
+  'I recommend immediate celebration.',
+]);
+
+const WALK_DISCOVERY_MIN_MS = 22000;
+const WALK_DISCOVERY_DISTANCE_MIN = 380;
+const WALK_DISCOVERY_DISTANCE_SPAN = 520;
+
+function hashSeed(parts) {
+  let hash = 2166136261;
+  const text = String(parts);
+  for (let index = 0; index < text.length; index += 1) {
+    hash ^= text.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function pickFrom(list, seed, salt) {
+  const index = hashSeed(`${seed}:${salt}`) % list.length;
+  return list[index];
+}
+
+function buildWalkDiscoveryStory(dogName, nowMs, seedExtras) {
+  const name = dogName || 'Kabs';
+  const seed = hashSeed(
+    `${name}|${Math.floor(nowMs / 1000)}|${seedExtras || ''}|${Math.random()}`,
+  );
+  const hook = pickFrom(WALK_DISCOVERY_HOOKS, seed, 'hook');
+  const treat = pickFrom(WALK_DISCOVERY_TREATS, seed, 'treat');
+  const place = pickFrom(WALK_DISCOVERY_PLACES, seed, 'place');
+  const twist = pickFrom(WALK_DISCOVERY_TWISTS, seed, 'twist');
+  const templates = [
+    `${hook} ${name} found ${treat} ${place}. ${twist}`,
+    `${hook} I found a treat — ${treat} — ${place}. ${twist}`,
+    `${name} reporting: found ${treat} ${place}. ${twist}`,
+    `${hook} Discovery unlocked: ${treat}, spotted ${place}. ${twist}`,
+    `While walking, I found ${treat} ${place}. ${twist}`,
+  ];
+  const story = pickFrom(templates, seed, 'template');
+  return {
+    story: story,
+    treat: treat,
+    place: place,
+    seed: seed,
+  };
+}
+
+function canWalkDiscover(lastDiscoverAt, nowMs) {
+  if (typeof lastDiscoverAt !== 'number' || !lastDiscoverAt) {
+    return true;
+  }
+  return nowMs - lastDiscoverAt >= WALK_DISCOVERY_MIN_MS;
+}
+
+function nextWalkDiscoverDistance(seed) {
+  const span = hashSeed(String(seed || Date.now())) % WALK_DISCOVERY_DISTANCE_SPAN;
+  return WALK_DISCOVERY_DISTANCE_MIN + span;
+}
+
 function createDefaultMemory() {
   return {
     favouriteFood: null,
@@ -417,7 +539,7 @@ function memoryLine(excitement, dogName) {
     return SPEECH_FUN.memoryCorner[0];
   }
   if (memory.walkiesAccepted >= 2) {
-    return SPEECH_FUN.memoryBreak[0].replace('{name}', dogName || 'Biscuit');
+    return SPEECH_FUN.memoryBreak[0].replace('{name}', dogName || 'Kabs');
   }
   return null;
 }
@@ -436,7 +558,7 @@ function wakeReaction(personality) {
 function funSpeech(kind, nowMs, dogName) {
   const lines = SPEECH_FUN[kind] || SPEECH_FUN.play;
   const index = Math.abs(Math.floor(nowMs / 45000) + kind.length) % lines.length;
-  return String(lines[index]).replace(/\{name\}/g, dogName || 'Biscuit');
+  return String(lines[index]).replace(/\{name\}/g, dogName || 'Kabs');
 }
 
 function findById(findId) {
@@ -472,6 +594,14 @@ const excitementApi = {
   ULTRA_RARE_EVENTS,
   COMBO_TABLE,
   SPEECH_FUN,
+  WALK_DISCOVERY_HOOKS,
+  WALK_DISCOVERY_TREATS,
+  WALK_DISCOVERY_PLACES,
+  WALK_DISCOVERY_TWISTS,
+  WALK_DISCOVERY_MIN_MS,
+  buildWalkDiscoveryStory,
+  canWalkDiscover,
+  nextWalkDiscoverDistance,
   createDefaultMemory,
   createDefaultExcitement,
   validateExcitement,

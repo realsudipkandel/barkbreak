@@ -1,8 +1,8 @@
-# Bark Break
+# Paw Pause
 
-A real dog that lives on your websites.
+A calm virtual companion that lives on your websites.
 
-Biscuit walks along the bottom of the page, sits, sleeps, asks for food or a short walk, and reacts when you pet him. No shop, coins, account, or dashboard.
+Kabs walks along the bottom of the page, sits, sleeps, finds treats, asks for food or a short walk, and reacts when you pet them. No shop, coins, account, or dashboard.
 
 ## Load unpacked
 
@@ -15,11 +15,14 @@ node ../scripts/prepare-local-dev.js --only barkbreak
 
 ```bash
 node scripts/shared.test.js
+node scripts/sounds.test.js
 ```
 
-## Dog assets
+## Companion assets
 
-Pose frames live in `assets/dog/` (transparent PNGs). Swap in filmed green-screen WebM loops later using the same behavior names (`walk-right-*`, `sit`, `sleep`, `eat`, …).
+Pose frames live in `assets/dog/` and `assets/cat/` (transparent PNGs). Walk motion uses `requestAnimationFrame`, GPU transforms, and crossfaded frames. Cat looks include ginger, black, and black & white (CSS filters on the cat set).
+
+Icons: `node scripts/generate-icons.js` (toolbar sizes). Designed mark source: `icons/paw-pause-icon-source.png`.
 
 ## Privacy
 
